@@ -139,7 +139,7 @@ h2 {
   width: 100%;
 
   /** Class for a single list container. It should be added to a div that wraps a every element for a single list.*/
-.joke-lists-container {
+.joke-list-container {
     flex-basis: 45%;
     width: 100%;
 
