@@ -33,3 +33,12 @@ export const updateJoke = async (jokeId, updatedJoke) => {
 
     return response.json();
 };
+
+export const deleteJoke = async (jokeId) => {
+    const response = await fetch(`http://localhost:8088/jokes/${jokeId}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to delete joke");
+    }
+  };

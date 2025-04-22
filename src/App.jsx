@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import { postJoke, getAllJokes, updateJoke } from "./services/JokeService.jsx";
+import { postJoke, getAllJokes, updateJoke, deleteJoke } from "./services/JokeService.jsx";
+
+
 
 export const App = () => {
   const [jokeInput, setJokeInput] = useState("");
@@ -68,24 +70,35 @@ export const App = () => {
   };
 
   // Handle toggling the "told" status
-  useEffect(() => {
-    if (jokeToToggle) {
-      const updatedJoke = { ...jokeToToggle, told: !jokeToToggle.told };
+  // useEffect(() => {
+  //   if (jokeToToggle) {
+  //     const updatedJoke = { ...jokeToToggle, told: !jokeToToggle.told };
 
-      updateJoke(jokeToToggle.id, updatedJoke)
-        .then(() => {
-          setJokes((prevJokes) =>
-            prevJokes.map((joke) =>
-              joke.id === jokeToToggle.id ? updatedJoke : joke
-            )
-          );
-          setJokeToToggle(null); // Reset the state
-        })
-        .catch((error) => {
-          console.error("Error updating joke:", error);
-        });
-    }
-  }, [jokeToToggle]);
+  //     updateJoke(jokeToToggle.id, updatedJoke)
+  //       .then(() => {
+  //         setJokes((prevJokes) =>
+  //           prevJokes.map((joke) =>
+  //             joke.id === jokeToToggle.id ? updatedJoke : joke
+  //           )
+  //         );
+  //         setJokeToToggle(null); // Reset the state
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error updating joke:", error);
+  //       });
+  //   }
+  // }, [jokeToToggle]);
+
+  const handleDeleteJoke = (jokeId) => {
+    deleteJoke(jokeId)
+      .then(() => {
+        // Remove the joke from the local state
+        setJokes((prevJokes) => prevJokes.filter((joke) => joke.id !== jokeId));
+      })
+      .catch((error) => {
+        console.error("Error deleting joke:", error);
+      });
+  };
 
   const untoldJokes = jokes.filter((joke) => joke.told === false);
   const toldJokes = jokes.filter((joke) => joke.told === true);
@@ -109,7 +122,11 @@ export const App = () => {
         /><button
           className="joke-input-submit"
           // onClick={handleAddJoke}
-          onClick={() => setAddJokeTrigger(true)} // Set the trigger to true
+          onClick={() => {
+            if (jokeInput.trim() !== "") {
+              setAddJokeTrigger(true)
+            } // Set the trigger to true
+          }}
         >Add Joke
         </button>
       </div>
@@ -123,9 +140,19 @@ export const App = () => {
         <div className="untold-count">
           <ul>
             {untoldJokes.map((joke) => (
-              <li className="joke-list-item " key={joke.id}>
-                {joke.text}
-                <button onClick={() => toggleToldStatus(joke.id)}>Mark as Told</button>
+              <li className="joke-list-item " key={joke.id}
+              >{joke.text}
+                <button 
+                  className="joke-list-action-toggle"
+                  onClick={() => toggleToldStatus(joke.id)}
+                >Mark as Told
+                </button>
+                {/* <button onClick={() => setJokeToToggle(joke)}>Mark as Told</button> */}
+                <button
+                  className="joke-list-action-delete" 
+                  onClick={() => handleDeleteJoke(joke.id)}
+                >Delete
+                </button>
                 {/* Add buttons for future functionality */}
               </li>
             ))}
@@ -140,10 +167,19 @@ export const App = () => {
           </h2>
           <ul className="told-count">
             {toldJokes.map((joke) => (
-              <li className="joke-list-item" key={joke.id}>
-                {joke.text}
-                <button onClick={() => toggleToldStatus(joke.id)}>Mark as Untold</button>
-
+              <li className="joke-list-item" key={joke.id}
+              >{joke.text}
+                <button 
+                  className="joke-list-action-toggle"
+                  onClick={() => toggleToldStatus(joke.id)}
+                  >Mark as Untold
+                </button>
+                {/* <button onClick={() => setJokeToToggle(joke)}>Mark as Untold</button> */}
+                <button
+                  className="joke-list-action-delete" 
+                  onClick={() => handleDeleteJoke(joke.id)}
+                > Delete
+                </button>
                 {/* Add buttons for future functionality */}
               </li>
             ))}
